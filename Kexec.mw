@@ -1,0 +1,55 @@
+[[Category:Boot process]] [[Category:Kernel]]
+
+'''kexec''' is a set of systems call that allows you to load another kernel
+from the currently executing Linux kernel. This is useful for kernel developers
+or other people who need to reboot very quickly without waiting for the whole
+BIOS boot process to finish. Note that there may appear some problems and kexec
+may not work correctly for you because the devices ''won't'' fully reinitiate
+when using this method.
+
+To install kexec, type:
+ # pacman -Sy kexec-tools
+
+Arch rc scripts already have kexec support, so it's enough to just call reboot
+after loading the kernel and it'll get (re)started.
+
+==Tips & Tricks==
+===Rebooting your system using kexec===
+Here is a simple script that reads kernel information from the GRUB
+menu, loads the kernel using kexec and reboots. Save the script as e.g.
+/usr/local/sbin/kexec-reboot.sh and make it executable using chmod +x.
+
+====Script usage====
+The script takes an item number as it's first parameter. E.g. to boot the first
+item in your GRUB menu, type:
+ # /usr/local/sbin/kexec-reboot 1
+
+====The script====
+ #!/bin/sh
+ # This script loads a kernel from the GRUB menu and reboots.
+ # The error checking is very basic.
+ # By Přemysl Janouch, 2008
+ 
+ if [ `id -u` -ne 0 ]; then echo "Error: Only a superuser can do this" >&amp;2; exit 1; fi
+ 
+ # Choose the #$1 kernel from the GRUB menu or the first one if none was specified.
+ if [ "x$1" = "x" ]; then N=1
+ elif awk 'BEGIN{exit("'"$1"'"!~/^&#91;&#91;:digit:&#93;&#93;+$/)}'; then N=$1
+ else echo "Error: The parameter is not a number" >&amp;2; exit 1; fi
+ 
+ # This returns just the #N item in the GRUB menu.
+ ITEM=$(awk -v i="$N" '/^title/{if(c>i)exit;else c++}c==i{print}' /boot/grub/menu.lst)
+ if [ "x$ITEM" = "x" ]; then echo "Error: No such item" >&amp;2; exit 1; fi
+ 
+ KERNEL=$(echo "$ITEM" | awk '/^kernel/{print $2;exit}')
+ PARAM=$(echo "$ITEM" | awk '/^kernel/{print substr($0,index($0,$3));exit}')
+ INITRD=$(echo "$ITEM" | awk '/^initrd/{print $2;exit}')
+ if [ "x$KERNEL" = "x" ]; then echo "Error: No kernel" >&amp;2; exit 1; fi
+ 
+ # Load the kernel and reboot.
+ kexec -l $KERNEL --initrd=$INITRD --append="$PARAM"
+ reboot
+
+==More Resources==
+*[http://lse.sourceforge.net/kdump/ kdump: a kexec based crash dumping mechansim for Linux]
+*[http://www.ibm.com/developerworks/linux/library/l-kexec.html Reboot Linux faster using kexec]
