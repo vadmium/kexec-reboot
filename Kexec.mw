@@ -1,5 +1,6 @@
 [[Category:Boot process]] [[Category:Kernel]]
 
+==Introduction==
 '''kexec''' is a set of systems call that allows you to load another kernel
 from the currently executing Linux kernel. This is useful for kernel developers
 or other people who need to reboot very quickly without waiting for the whole
@@ -7,9 +8,11 @@ BIOS boot process to finish. Note that there may appear some problems and kexec
 may not work correctly for you because the devices ''won't'' fully reinitiate
 when using this method.
 
+==Installation==
 To install kexec, type:
  # pacman -Sy kexec-tools
 
+==Configuration==
 Arch rc scripts already have kexec support, so it's enough to just call reboot
 after loading the kernel and it'll get (re)started.
 
