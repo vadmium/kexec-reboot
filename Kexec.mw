@@ -1,4 +1,4 @@
-[[Category:Boot process]] [[Category:Kernel]]
+[[Category:Boot process (English)]] [[Category:Kernel (English)]]
 
 ==Introduction==
 '''kexec''' is a set of systems call that allows you to load another kernel
@@ -20,7 +20,7 @@ after loading the kernel and it'll get (re)started.
 ===Rebooting your system using kexec===
 Here is a simple script that reads kernel information from the GRUB
 menu, loads the kernel using kexec and reboots. Save the script as e.g.
-/usr/local/sbin/kexec-reboot.sh and make it executable using chmod +x.
+/usr/local/sbin/kexec-reboot.sh and make it executable using <code>chmod +x</code>.
 
 ====Script usage====
 The script takes an item number as it's first parameter. E.g. to boot the first
