@@ -22,6 +22,8 @@ Here is a simple script that reads kernel information from the GRUB
 menu, loads the kernel using kexec and reboots. Save the script as e.g.
 /usr/local/sbin/kexec-reboot.sh and make it executable using <code>chmod +x</code>.
 
+'''''Note:''' The script supports only GRUB Legacy menu files, not [[GRUB2|grub2]].
+
 ====Script usage====
 The script takes an item number as it's first parameter. E.g. to boot the first
 item in your GRUB menu, type:
