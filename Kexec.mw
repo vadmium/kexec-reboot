@@ -1,6 +1,6 @@
 [[Category:Boot process (English)]][[Category:Kernel (English)]]
-'''Kexec''' is a set of systems call that allows you to load another kernel
-from the currently executing Linux kernel. This is useful for kernel developers
+'''Kexec''' is a system call that enables you to load and boot into another
+kernel from the currently running kernel. This is useful for kernel developers
 or other people who need to reboot very quickly without waiting for the whole
 BIOS boot process to finish. Note that there may appear some problems and kexec
 may not work correctly for you because the devices ''won't'' fully reinitiate
@@ -8,7 +8,7 @@ when using this method.
 
 ==Installation==
 To install kexec, type:
- # pacman -Sy kexec-tools
+  pacman -Sy kexec-tools
 
 ==Configuration==
 Arch rc scripts already have kexec support, so it's enough to just call reboot
@@ -17,15 +17,15 @@ after loading the kernel and it'll get (re)started.
 ==Tips & Tricks==
 ===Rebooting your system using kexec===
 Here is a simple script that reads kernel information from the GRUB
-menu, loads the kernel using kexec and reboots. Save the script as e.g.
+menu, loads the kernel using kexec, and then reboots. Save the script as, e.g.,
 /usr/local/sbin/kexec-reboot.sh and make it executable using <code>chmod +x</code>.
 
 '''''Note:''' The script supports only GRUB Legacy menu files, not [[GRUB2|grub2]].
 
 ====Script usage====
-The script takes an item number as it's first parameter. E.g. to boot the first
+The script takes an item number as its first parameter. E.g., to boot the first
 item in your GRUB menu, type:
- # /usr/local/sbin/kexec-reboot 1
+  /usr/local/sbin/kexec-reboot.sh 1
 
 ====The script====
  #!/bin/sh
