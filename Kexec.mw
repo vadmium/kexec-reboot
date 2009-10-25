@@ -1,4 +1,4 @@
-[[Category:Boot process (English)]] [[Category:Kernel (English)]]
+[[Category:Boot process (English)]][[Category:Kernel (English)]]
 
 ==Introduction==
 '''kexec''' is a set of systems call that allows you to load another kernel
