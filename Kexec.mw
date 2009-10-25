@@ -44,15 +44,15 @@ item in your GRUB menu, type:
  
  # This returns just the #N item in the GRUB menu.
  ITEM=$(awk -v i="$N" '/^title/{if(c>i)exit;else c++}c==i{print}' /boot/grub/menu.lst)
- if [ "x$ITEM" = "x" ]; then echo "Error: No such item" >&amp;2; exit 1; fi
+ if [ -z "$ITEM" ]; then echo "Error: No such item" >&amp;2; exit 1; fi
  
  KERNEL=$(echo "$ITEM" | awk '/^kernel/{print $2;exit}')
  PARAM=$(echo "$ITEM" | awk '/^kernel/{print substr($0,index($0,$3));exit}')
  INITRD=$(echo "$ITEM" | awk '/^initrd/{print $2;exit}')
- if [ "x$KERNEL" = "x" ]; then echo "Error: No kernel" >&amp;2; exit 1; fi
+ if [ -z "$KERNEL" ]; then echo "Error: No kernel" >&amp;2; exit 1; fi
  
  # Load the kernel and reboot.
- kexec -l $KERNEL --initrd=$INITRD --append="$PARAM"
+ kexec -l "$KERNEL" --initrd="$INITRD" --append="$PARAM"
  reboot
 
 ==More Resources==
