@@ -1,6 +1,4 @@
 [[Category:Boot process (English)]][[Category:Kernel (English)]]
-
-==Introduction==
 '''kexec''' is a set of systems call that allows you to load another kernel
 from the currently executing Linux kernel. This is useful for kernel developers
 or other people who need to reboot very quickly without waiting for the whole
