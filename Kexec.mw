@@ -38,7 +38,7 @@ item in your GRUB menu, type:
  if [ $UID -ne 0 ]; then echo "Error: Only a superuser can do this" >&amp;2; exit 1; fi
  
  # Choose the #$1 kernel from the GRUB menu or the first one if none was specified.
- if [ "x$1" = "x" ]; then N=1
+ if [ -z "$1" ]; then N=1
  elif awk 'BEGIN{exit("'"$1"'"!~/^&#91;&#91;:digit:&#93;&#93;+$/)}'; then N=$1
  else echo "Error: The parameter is not a number" >&amp;2; exit 1; fi
  
