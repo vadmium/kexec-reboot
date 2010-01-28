@@ -8,7 +8,7 @@ when using this method.
 
 ==Installation==
 To install kexec, type:
-  pacman -Sy kexec-tools
+  pacman -S kexec-tools
 
 ==Configuration==
 Arch rc scripts already have kexec support, so it's enough to just call reboot
