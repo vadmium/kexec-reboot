@@ -27,31 +27,72 @@ The script takes an item number as its first parameter. E.g., to boot the first
 item in your GRUB menu, type:
   /usr/local/sbin/kexec-reboot.sh 1
 
+The following script allows you to select a kernel to reboot into as a number from 1 to the number of items in the GRUB menu or prompts you for a selection based upon the said menu.
 ====The script====
- #!/bin/sh
+ #!/bin/bash
  # This script loads a kernel from the GRUB menu and reboots.
  # The error checking is very basic.
  # By Přemysl Janouch, 2008
- 
- if [ $UID -ne 0 ]; then echo "Error: Only a superuser can do this" >&amp;2; exit 1; fi
- 
- # Choose the #$1 kernel from the GRUB menu or the first one if none was specified.
- if [ -z "$1" ]; then N=1
- elif awk 'BEGIN{exit("'"$1"'"!~/^&#91;&#91;:digit:&#93;&#93;+$/)}'; then N=$1
- else echo "Error: The parameter is not a number" >&amp;2; exit 1; fi
- 
- # This returns just the #N item in the GRUB menu.
- ITEM=$(awk -v i="$N" '/^title/{if(c>i)exit;else c++}c==i{print}' /boot/grub/menu.lst)
- if [ -z "$ITEM" ]; then echo "Error: No such item" >&amp;2; exit 1; fi
- 
- KERNEL=$(echo "$ITEM" | awk '/^kernel/{print $2;exit}')
- PARAM=$(echo "$ITEM" | awk '/^kernel/{print substr($0,index($0,$3));exit}')
- INITRD=$(echo "$ITEM" | awk '/^initrd/{print $2;exit}')
- if [ -z "$KERNEL" ]; then echo "Error: No kernel" >&amp;2; exit 1; fi
- 
- # Load the kernel and reboot.
- kexec -l "$KERNEL" --initrd="$INITRD" --append="$PARAM"
- reboot
+ # Rewritten by Isaac G, 2010
+
+ die ()
+ {
+    tput setaf 1 # Red text
+    echo "Error: $@" >&2
+    tput sgr0 # Reset
+    exit 1
+ }
+
+ (( UID != 0 )) && die "You need to be superuser"
+ unset number
+
+ # Use the first parameter or show a menu if none is specified
+ if [[ $1 ]] ; then
+    # Make sure the selected number is an integer
+    [[ $1 = *[^0-9]* ]] && die "The selected parameter is not a number"
+    number=$1
+ else
+    # Nothing selected; pull up a list of options from the grub menu
+    oldIFS="$IFS"
+    IFS=$'\n'
+
+    # Get the titles
+    options=( $(awk '$1 == "title" {for (i = 2; i <= NF; i++) printf "%s ", $i; printf "\n";}' /boot/grub/menu.lst ) )
+
+    # Ask the user to select one
+    select title in "${options[@]}" ; do
+        for ((i = 0; i < ${#options[@]}; i++)); do
+            [[ $title == "${options[i]}" ]] && number=$((i + 1)) && break
+        done
+        [[ $number ]] && break
+    done
+
+    IFS="$oldIFS"
+ fi
+
+ unset kernel
+ unset initrd
+ unset append
+ item=0
+
+ # Parse the grub menu.lst
+ while read key val extra; do
+    [[ $key = "title" ]] && ((item++)) # Count the number of title's
+    (( item == number )) || continue   # Wait until the right number
+    [[ $key = "kernel" ]] && kernel="$val" && append="$extra"
+    [[ $key = "initrd" ]] && initrd="$val"
+ done < /boot/grub/menu.lst
+
+ [[ $kernel ]] || die "No such kernel with that number"
+
+ # Load the kernel
+ echo kexec -l "$kernel" --initrd="$initrd" --append="$append"
+
+ # Sync the disks
+ sync
+
+ # Reboot
+ kexec -e
 
 ==More Resources==
 *[http://lse.sourceforge.net/kdump/ kdump: a kexec based crash dumping mechansim for Linux]
