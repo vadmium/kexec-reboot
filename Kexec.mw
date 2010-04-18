@@ -34,7 +34,7 @@ The following script allows you to select a kernel to reboot into as a number fr
  # The error checking is very basic.
  # By Přemysl Janouch, 2008
  # Rewritten by Isaac G, 2010
-
+ 
  die ()
  {
     tput setaf 1 # Red text
@@ -42,10 +42,10 @@ The following script allows you to select a kernel to reboot into as a number fr
     tput sgr0 # Reset
     exit 1
  }
-
+ 
  (( UID != 0 )) && die "You need to be superuser"
  unset number
-
+ 
  # Use the first parameter or show a menu if none is specified
  if [[ $1 ]] ; then
     # Make sure the selected number is an integer
@@ -55,10 +55,10 @@ The following script allows you to select a kernel to reboot into as a number fr
     # Nothing selected; pull up a list of options from the grub menu
     oldIFS="$IFS"
     IFS=$'\n'
-
+ 
     # Get the titles
     options=( $(awk '$1 == "title" {for (i = 2; i <= NF; i++) printf "%s ", $i; printf "\n";}' /boot/grub/menu.lst ) )
-
+ 
     # Ask the user to select one
     select title in "${options[@]}" ; do
         for ((i = 0; i < ${#options[@]}; i++)); do
@@ -66,15 +66,15 @@ The following script allows you to select a kernel to reboot into as a number fr
         done
         [[ $number ]] && break
     done
-
+ 
     IFS="$oldIFS"
  fi
-
+ 
  unset kernel
  unset initrd
  unset append
  item=0
-
+ 
  # Parse the grub menu.lst
  while read key val extra; do
     [[ $key = "title" ]] && ((item++)) # Count the number of title's
@@ -82,15 +82,15 @@ The following script allows you to select a kernel to reboot into as a number fr
     [[ $key = "kernel" ]] && kernel="$val" && append="$extra"
     [[ $key = "initrd" ]] && initrd="$val"
  done < /boot/grub/menu.lst
-
+ 
  [[ $kernel ]] || die "No such kernel with that number"
-
+ 
  # Load the kernel
  echo kexec -l "$kernel" --initrd="$initrd" --append="$append"
-
+ 
  # Sync the disks
  sync
-
+ 
  # Reboot
  kexec -e
 
