@@ -27,7 +27,8 @@ The script takes an item number as its first parameter. E.g., to boot the first
 item in your GRUB menu, type:
   /usr/local/sbin/kexec-reboot.sh 1
 
-The following script allows you to select a kernel to reboot into as a number from 1 to the number of items in the GRUB menu or prompts you for a selection based upon the said menu.
+Alternatively, if no number is given, the script will interactively prompt for a number.
+
 ====The script====
 <pre>
 #!/bin/bash
