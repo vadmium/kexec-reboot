@@ -34,8 +34,7 @@ Alternatively, if no number is given, the script will interactively prompt for a
 #!/bin/bash
 # This script loads a kernel from the GRUB menu and reboots.
 # The error checking is very basic.
-# By Přemysl Janouch, 2008
-# Rewritten by Isaac G, 2010
+# Written by Isaac G, 2010
 
 die ()
 {
