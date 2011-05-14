@@ -11,25 +11,25 @@ To install kexec, type:
   pacman -S kexec-tools
 
 ==Configuration==
-Arch rc scripts already have kexec support, so it's enough to just call reboot
+Arch rc scripts already have kexec support. This means the kexec command can be used to invoke [[Shutdown]] directly. Alternatively you can call reboot
 after loading the kernel and it'll get (re)started.
 
-==Tips & Tricks==
-===Rebooting your system using kexec===
-Here is a simple script that reads kernel information from the GRUB
-menu, loads the kernel using kexec, and then reboots. Save the script as, e.g.,
+==Rebooting using kexec==
+The simplest way to shut down and reboot using kexec is to use a command like the following, substituting the same image, command line ("append") and initial RAM FS as the bootloader would, or even using the contents of /proc/cmdline.
+
+  kexec /boot/vmlinuz26 --append='root=/dev/disk/by-label/<LABEL> ro' --initrd=/boot/kernel26.img
+
+===Bootloader scripts===
+These scripts read kernel information from the GRUB menu to pass to kexec. Save a script as, e.g.,
 /usr/local/sbin/kexec-reboot.sh and make it executable using <code>chmod +x</code>.
 
-'''''Note:''' The script supports only GRUB Legacy menu files, not [[GRUB2|grub2]].
-
-====Script usage====
 The script takes an item number as its first parameter. E.g., to boot the first
 item in your GRUB menu, type:
   /usr/local/sbin/kexec-reboot.sh 1
 
 Alternatively, if no number is given, the script will interactively prompt for a number.
 
-====Script for Grub 1====
+====Grub 1====
 <pre>
 #!/bin/bash
 # This script loads a kernel from the GRUB menu and reboots.
@@ -86,17 +86,18 @@ done < /boot/grub/menu.lst
 
 [[ $kernel ]] || die "No such kernel with that number"
 
-# Load the kernel
-echo kexec -l "$kernel" --initrd="$initrd" --append="$append"
+# http://stackoverflow.com/questions/2167558/give-the-mount-point-of-a-path
+root="$(df /boot | tail -n 1 | awk '{ print $NF}')"
 
-# Sync the disks
-sync
-
-# Reboot
-kexec -e
+set -- "$root$kernel"
+[[ -n "${initrd+set}" ]] && set -- "$@" --initrd="$root$initrd"
+set -- "$@" --append="$append"
+kexec "$@"
 </pre>
 
-====Script for Grub 2====
+====Grub 2====
+This loads the kernel using kexec, and then reboots (without doing a normal shutdown).
+
 <pre>
 #!/bin/bash
 # This script loads a kernel from the GRUB 2 menu and reboots.
