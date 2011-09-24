@@ -12,7 +12,7 @@ To install kexec, type:
 
 ==Configuration==
 Arch rc scripts already have kexec support. This means the kexec command can be used to invoke [[Shutdown]] directly. Alternatively you can call reboot
-after loading the kernel and it'll get (re)started.
+after loading the kernel and it'll get (re)started. To use the built in scripts just add 'kexec' to your DAEMONS in /etc/rc.conf
 
 ==Rebooting using kexec==
 The simplest way to shut down and reboot using kexec is to use a command like the following, substituting the same image, command line ("append") and initial RAM FS as the bootloader would, or even using the contents of /proc/cmdline.
