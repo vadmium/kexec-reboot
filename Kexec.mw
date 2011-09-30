@@ -15,21 +15,20 @@ Arch Linux's rc scripts already have kexec support. This means the kexec command
 after loading the kernel and it will get (re)started. To use the built in scripts just add {{Codeline|kexec}} to your {{Codeline|DAEMONS}} array in {{Filename|/etc/rc.conf}}
 
 ==Rebooting using kexec==
-The simplest way to shut down and reboot using kexec is to use a command like the following, substituting the same image, command line ("append") and initial RAM FS as the bootloader would, or even using the contents of /proc/cmdline.
-
-  kexec /boot/vmlinuz26 --append='root=/dev/disk/by-label/<LABEL> ro' --initrd=/boot/kernel26.img
+The simplest way to shut down and reboot using kexec is to use a command like the following, substituting the same image, command line ("append") and initial RAM FS as the bootloader would, or even using the contents of {{Filename|/proc/cmdline}}.
+ kexec /boot/vmlinuz26 --append='root=/dev/disk/by-label/<LABEL> ro' --initrd=/boot/kernel26.img
 
 ===Bootloader scripts===
 These scripts read kernel information from the GRUB menu to pass to kexec. Save a script as, e.g.,
-/usr/local/sbin/kexec-reboot.sh and make it executable using <code>chmod +x</code>.
+{{Filename|/usr/local/sbin/kexec-reboot.sh}} and make it executable using {{Codeline|chmod +x}}.
 
 The script takes an item number as its first parameter. E.g., to boot the first
 item in your GRUB menu, type:
-  /usr/local/sbin/kexec-reboot.sh 1
+ /usr/local/sbin/kexec-reboot.sh 1
 
 Alternatively, if no number is given, the script will interactively prompt for a number.
 
-====Grub 1====
+====GRUB 1====
 <pre>
 #!/bin/bash
 # This script loads a kernel from the GRUB menu and reboots.
@@ -76,7 +75,7 @@ unset initrd
 unset append
 item=0
 
-# Parse the grub menu.lst
+# Parse GRUBs menu.lst
 while read key val extra; do
    [[ $key = "title" ]] && ((item++)) # Count the number of title's
    (( item == number )) || continue   # Wait until the right number
@@ -95,7 +94,7 @@ set -- "$@" --append="$append"
 kexec "$@"
 </pre>
 
-====Grub 2====
+====GRUB 2====
 This loads the kernel using kexec, and then reboots (without doing a normal shutdown).
 
 <pre>
@@ -145,7 +144,7 @@ unset initrd
 unset append
 item=0
 
-# Parse the grub grub.cfg 
+# Parse GRUBs grub.cfg 
 while read key val extra; do
    [[ $key = "menuentry" ]] && ((item++)) # Count the number of menuentry's
    (( item == number )) || continue   # Wait until the right number
