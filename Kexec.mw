@@ -7,8 +7,7 @@ may not work correctly for you because the devices ''won't'' fully reinitiate
 when using this method.
 
 ==Installation==
-To install kexec, type:
-  pacman -S kexec-tools
+To install kexec, [[pacman|install]] the {{Pkg|kexec-tools}} package which is available in the [[Official Repositories|official repositories]].
 
 ==Configuration==
 Arch Linux's rc scripts already have kexec support. This means the kexec command can be used to invoke [[Shutdown]] directly. Alternatively you can call reboot
