@@ -15,7 +15,7 @@ after loading the kernel and it will get (re)started. To use the built in script
 
 ==Rebooting using kexec==
 The simplest way to shut down and reboot using kexec is to use a command like the following, substituting the same image, command line ("append") and initial RAM FS as the bootloader would, or even using the contents of {{Filename|/proc/cmdline}}.
- kexec /boot/vmlinuz26 --append='root=/dev/disk/by-label/<LABEL> ro' --initrd=/boot/kernel26.img
+ kexec /boot/vmlinuz-linux --append='root=/dev/disk/by-label/<LABEL> ro' --initrd=/boot/initramfs-linux.img
 
 ===Bootloader scripts===
 These scripts read kernel information from the GRUB menu to pass to kexec. Save a script as, e.g.,
