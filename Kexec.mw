@@ -1,4 +1,6 @@
-[[Category:Boot process (English)]][[Category:Kernel (English)]]
+[[Category:Boot process (English)]]
+[[Category:Kernel (English)]]
+{{i18n|Kexec}}
 '''Kexec''' is a system call that enables you to load and boot into another
 kernel from the currently running kernel. This is useful for kernel developers
 or other people who need to reboot very quickly without waiting for the whole
