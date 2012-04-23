@@ -1,4 +1,4 @@
-[[Category:Boot process (English)]]
+[[Category:Boot process]]
 [[Category:Kernel (English)]]
 {{i18n|Kexec}}
 '''Kexec''' is a system call that enables you to load and boot into another
