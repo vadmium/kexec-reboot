@@ -26,19 +26,22 @@ die ()
 }
  
 (( UID != 0 )) && die "You need to be superuser"
-unset number
 
-# For original Grub:
-GRUB_CONFIG=/boot/grub/menu.lst
-GRUB_TITLE=title  # Command for menu item name
-GRUB_KERNEL=kernel  # Command for boot image
+probe ()
+{
+   test -e "$1" || return
+   GRUB_CONFIG="$1"
+   GRUB_TITLE="$2"  # Command for menu item name
+   GRUB_KERNEL="$3"  # Command for boot image
+}
 
-# For Grub 2:
-#GRUB_CONFIG=/boot/grub/grub.cfg
-#GRUB_TITLE=menuentry
-#GRUB_KERNEL=linux
+# Config file for Grub 2 overrides original "legacy" one
+probe /boot/grub/grub.cfg menuentry linux ||
+probe /boot/grub/menu.lst title kernel ||
+die "No Grub configuration found"
 
 # Use the first parameter or show a menu if none is specified
+unset number
 if [[ $1 ]] ; then
    # Make sure the selected number is an integer
    [[ $1 = *[^0-9]* ]] && die "The selected parameter is not a number"
@@ -49,7 +52,7 @@ else
    IFS=$'\n'
 
    # Get the menu items
-   options=( $(awk '$1 == "$GRUB_TITLE" {for (i = 2; i <= NF; i++) printf "%s ", $i; printf "\n";}' "$GRUB_CONFIG" ) )
+   options=( $(awk '$1 == "'"$GRUB_TITLE"'" {for (i = 2; i <= NF; i++) printf "%s ", $i; printf "\n";}' "$GRUB_CONFIG" ) )
 
    # Ask the user to select one
    select title in "${options[@]}" ; do
