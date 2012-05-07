@@ -1,25 +1,6 @@
-[[Category:Boot process]]
-[[Category:Kernel]]
-{{i18n|Kexec}}
-'''Kexec''' is a system call that enables you to load and boot into another
-kernel from the currently running kernel. This is useful for kernel developers
-or other people who need to reboot very quickly without waiting for the whole
-BIOS boot process to finish. Note that there may appear some problems and kexec
-may not work correctly for you because the devices ''won't'' fully reinitiate
-when using this method.
+#!/bin/bash
 
-==Installation==
-To install kexec, [[pacman|install]] the {{Pkg|kexec-tools}} package which is available in the [[Official Repositories|official repositories]].
-
-==Configuration==
-Arch Linux's rc scripts already have kexec support. This means the kexec command can be used to invoke [[Shutdown]] directly. Alternatively you can call reboot
-after loading the kernel and it will get (re)started. To use the built in scripts just add {{Ic|kexec}} to your {{Ic|DAEMONS}} array in {{ic|/etc/rc.conf}}
-
-==Rebooting using kexec==
-The simplest way to shut down and reboot using kexec is to use a command like the following, substituting the same image, command line ("append") and initial RAM FS as the bootloader would, or even using the contents of {{ic|/proc/cmdline}}.
- kexec /boot/vmlinuz-linux --append='root=/dev/disk/by-label/<LABEL> ro' --initrd=/boot/initramfs-linux.img
-
-===Bootloader scripts===
+<< 'COMMENT'
 These scripts read kernel information from the GRUB menu to pass to kexec. Save a script as, e.g.,
 {{ic|/usr/local/sbin/kexec-reboot.sh}} and make it executable using {{Ic|chmod +x}}.
 
@@ -28,10 +9,8 @@ item in your GRUB menu, type:
  /usr/local/sbin/kexec-reboot.sh 1
 
 Alternatively, if no number is given, the script will interactively prompt for a number.
+COMMENT
 
-====GRUB 1====
-<pre>
-#!/bin/bash
 # This script loads a kernel from the GRUB menu and reboots.
 # The error checking is very basic.
 # Written by Isaac G, 2010
@@ -93,12 +72,11 @@ set -- "$root$kernel"
 [[ -n "${initrd+set}" ]] && set -- "$@" --initrd="$root$initrd"
 set -- "$@" --append="$append"
 kexec "$@"
-</pre>
 
-====GRUB 2====
-This loads the kernel using kexec, and then reboots (without doing a normal shutdown).
+exit
+# ====GRUB 2====
+# This loads the kernel using kexec, and then reboots (without doing a normal shutdown).
 
-<pre>
 #!/bin/bash
 # This script loads a kernel from the GRUB 2 menu and reboots.
 # The error checking is very basic.
@@ -163,8 +141,3 @@ sync
 
 ## Reboot
 kexec -e
-</pre>
-
-==More Resources==
-*[http://lse.sourceforge.net/kdump/ kdump: a kexec based crash dumping mechansim for Linux]
-*[http://www.ibm.com/developerworks/linux/library/l-kexec.html Reboot Linux faster using kexec]
