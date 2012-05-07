@@ -13,6 +13,7 @@
 
 # The error checking is very basic.
 # Written by Isaac G, 2010
+# Modified by Greg Fitzgerald, 2011
 # Ripped from the Arch Wiki "kexec" page 7 May 2012:
 #     https://wiki.archlinux.org/index.php?title=kexec
 
@@ -27,6 +28,16 @@ die ()
 (( UID != 0 )) && die "You need to be superuser"
 unset number
 
+# For original Grub:
+GRUB_CONFIG=/boot/grub/menu.lst
+GRUB_TITLE=title  # Command for menu item name
+GRUB_KERNEL=kernel  # Command for boot image
+
+# For Grub 2:
+#GRUB_CONFIG=/boot/grub/grub.cfg
+#GRUB_TITLE=menuentry
+#GRUB_KERNEL=linux
+
 # Use the first parameter or show a menu if none is specified
 if [[ $1 ]] ; then
    # Make sure the selected number is an integer
@@ -37,8 +48,8 @@ else
    oldIFS="$IFS"
    IFS=$'\n'
 
-   # Get the titles
-   options=( $(awk '$1 == "title" {for (i = 2; i <= NF; i++) printf "%s ", $i; printf "\n";}' /boot/grub/menu.lst ) )
+   # Get the menu items
+   options=( $(awk '$1 == "$GRUB_TITLE" {for (i = 2; i <= NF; i++) printf "%s ", $i; printf "\n";}' "$GRUB_CONFIG" ) )
 
    # Ask the user to select one
    select title in "${options[@]}" ; do
@@ -56,13 +67,13 @@ unset initrd
 unset append
 item=0
 
-# Parse GRUBs menu.lst
+# Parse GRUB's configuration file
 while read key val extra; do
-   [[ $key = "title" ]] && ((item++)) # Count the number of title's
+   [[ $key = "$GRUB_TITLE" ]] && ((item++)) # Count the number of menu items
    (( item == number )) || continue   # Wait until the right number
-   [[ $key = "kernel" ]] && kernel="$val" && append="$extra"
+   [[ $key = "$GRUB_KERNEL" ]] && kernel="$val" && append="$extra"
    [[ $key = "initrd" ]] && initrd="$val"
-done < /boot/grub/menu.lst
+done < "$GRUB_CONFIG"
 
 [[ $kernel ]] || die "No such kernel with that number"
 
@@ -73,72 +84,3 @@ set -- "$root$kernel"
 [[ -n "${initrd+set}" ]] && set -- "$@" --initrd="$root$initrd"
 set -- "$@" --append="$append"
 kexec "$@"
-
-exit
-# ====GRUB 2====
-# This loads the kernel using kexec, and then reboots (without doing a normal shutdown).
-
-#!/bin/bash
-# This script loads a kernel from the GRUB 2 menu and reboots.
-# The error checking is very basic.
-# Written by Isaac G, 2010
-# Modified by Greg Fitzgerald, 2011
-
-die ()
-{
-   tput setaf 1 # Red text
-   echo "Error: $@" >&2
-   tput sgr0 # Reset
-   exit 1
-}
- 
-(( UID != 0 )) && die "You need to be superuser"
-unset number
-
-# Use the first parameter or show a menu if none is specified
-if [[ $1 ]] ; then
-   # Make sure the selected number is an integer
-   [[ $1 = *[^0-9]* ]] && die "The selected parameter is not a number"
-   number=$1
-else
-   # Nothing selected; pull up a list of options from the grub menu
-   oldIFS="$IFS"
-   IFS=$'\n'
-
-   # Get the menuentrys
-   options=( $(awk '$1 == "menuentry" {for (i = 2; i <= NF; i++) printf "%s ", $i; printf "\n";}' /boot/grub/grub.cfg ) )
-
-   # Ask the user to select one
-   select menuentry in "${options[@]}" ; do
-       for ((i = 0; i < ${#options[@]}; i++)); do
-           [[ $menuentry == "${options[i]}" ]] && number=$((i + 1)) && break
-       done
-       [[ $number ]] && break
-   done
-
-   IFS="$oldIFS"
-fi
-
-unset kernel
-unset initrd
-unset append
-item=0
-
-# Parse GRUBs grub.cfg 
-while read key val extra; do
-   [[ $key = "menuentry" ]] && ((item++)) # Count the number of menuentry's
-   (( item == number )) || continue   # Wait until the right number
-   [[ $key = "linux" ]] && kernel="$val" && append="$extra"
-   [[ $key = "initrd" ]] && initrd="$val"
-done < /boot/grub/grub.cfg
-
-[[ $kernel ]] || die "No such kernel with that number"
-
-# Load the kernel
-kexec -l "/boot$kernel" --initrd="/boot$initrd" --append="$append"
-
-## Sync the disks
-sync
-
-## Reboot
-kexec -e
