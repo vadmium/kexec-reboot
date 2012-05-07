@@ -1,19 +1,20 @@
 #!/bin/bash
 
-<< 'COMMENT'
-These scripts read kernel information from the GRUB menu to pass to kexec. Save a script as, e.g.,
-{{ic|/usr/local/sbin/kexec-reboot.sh}} and make it executable using {{Ic|chmod +x}}.
+# This script reads kernel information from the GRUB menu to pass to "kexec".
+# Save a script as, e.g., /usr/local/sbin/kexec-reboot and make it executable
+# using chmod +x.
 
-The script takes an item number as its first parameter. E.g., to boot the first
-item in your GRUB menu, type:
- /usr/local/sbin/kexec-reboot.sh 1
+# The script takes an item number as its first parameter. E.g., to boot the
+# first item in the GRUB menu, type:
+#     kexec-reboot 1
 
-Alternatively, if no number is given, the script will interactively prompt for a number.
-COMMENT
+# Alternatively, if no number is given, the script will interactively prompt
+# for a number.
 
-# This script loads a kernel from the GRUB menu and reboots.
 # The error checking is very basic.
 # Written by Isaac G, 2010
+# Ripped from the Arch Wiki "kexec" page 7 May 2012:
+#     https://wiki.archlinux.org/index.php?title=kexec
 
 die ()
 {
