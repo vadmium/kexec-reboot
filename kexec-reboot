@@ -37,6 +37,7 @@ probe ()
 
 # Config file for Grub 2 overrides original "legacy" one
 probe /boot/grub/grub.cfg menuentry linux ||
+probe /boot/grub2/grub.cfg menuentry linux ||
 probe /boot/grub/menu.lst title kernel ||
 die "No Grub configuration found"
 
@@ -74,8 +75,8 @@ item=0
 while read key val extra; do
    [[ $key = "$GRUB_TITLE" ]] && ((item++)) # Count the number of menu items
    (( item == number )) || continue   # Wait until the right number
-   [[ $key = "$GRUB_KERNEL" ]] && kernel="$val" && append="$extra"
-   [[ $key = "initrd" ]] && initrd="$val"
+   [[ $key =~ ^$GRUB_KERNEL(|16)$ ]] && kernel="$val" && append="$extra"
+   [[ $key =~ ^initrd(|16)$ ]] && initrd="$val"
 done < "$GRUB_CONFIG"
 
 [[ $kernel ]] || die "No such kernel with that number"
